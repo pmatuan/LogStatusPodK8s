@@ -3,7 +3,7 @@ const { logRespone } = require('../daos/saveLog');
 const router = express.Router();
 const os = require('os');
 
-router.get('/stop1', async (req, res) => {
+router.get('/stop', async (req, res) => {
   const freeMemory = os.freemem();
   const hostname = os.hostname();
 
