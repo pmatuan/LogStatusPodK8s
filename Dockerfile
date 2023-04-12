@@ -1,6 +1,7 @@
-FROM node:12.19.0
+FROM node:18.15.0
 WORKDIR /app
 COPY package.json .
-RUN npm i
+RUN npm install
+RUN apt-get update && apt-get install -y curl
 COPY . .
 CMD ["npm", "start"]
