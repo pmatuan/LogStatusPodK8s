@@ -1,33 +1,33 @@
+const { logResponeStart, logResponeStop } = require('../daos/saveLog');
 const k8s = require('@kubernetes/client-node');
-const { logRespone } = require('../daos/saveLog');
+const kubeConfig = new k8s.KubeConfig();
+kubeConfig.loadFromDefault();
 
-const getIDStatusOfPod = async (namePrefix) => {
+const k8sApi = kubeConfig.makeApiClient(k8s.CoreV1Api);
+
+const getPodInformationStart = async (podName) => {
   try {
-    // create a Kubernetes API client
-    const kc = new k8s.KubeConfig();
-    kc.loadFromDefault();
-
-    const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
-
-    // list all Pods in the current namespace
-    const res = await k8sApi.listPodForAllNamespaces();
-
-    const pods = res.body.items;
-
-    // iterate through the Pods and filter by name prefix
-    const filteredPods = pods.filter((pod) =>
-      pod.metadata.name.startsWith(namePrefix),
-    );
-
-    // iterate through the filtered Pods and log ID and status
-    for (const pod of filteredPods) {
-      const podId = pod.metadata.uid;
-      const podStatus = pod.status.phase;
-      await logRespone(podId, podStatus);
-    }
+    const res = await k8sApi.readNamespacedPod(podName, 'default');
+    const container = res.body.spec.containers[0]; // assumes only 1 container in the pod
+    const imageNameOfPod = container.image;
+    await logResponeStart(podName, imageNameOfPod);
   } catch (err) {
-    console.error(`Error: ${err}`);
+    console.error(err);
   }
 };
 
-module.exports = { getIDStatusOfPod };
+const getPodInformationStop = async (podName) => {
+  try {
+    const res = await k8sApi.readNamespacedPod(podName, 'default');
+    const podStart = res.body.status.startTime;
+    const containerStatuses = res.body.status.containerStatuses;
+    const container = containerStatuses[0];
+    const containerStart = container.lastState.terminated.startedAt;
+    const containerStop = container.lastState.terminated.finishedAt;
+    await logResponeStop(podName, podStart, containerStart, containerStop);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+module.exports = { getPodInformationStart, getPodInformationStop };

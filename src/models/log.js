@@ -1,14 +1,30 @@
 const mongoose = require('mongoose');
 
-const Log = new mongoose.Schema(
+const LogStart = new mongoose.Schema(
   {
-    id: String,
-    status: String,
+    name: String,
+    imageNameOfPod: String
   },
   {
-    collection: 'audit',
+    collection: 'auditStart',
     versionKey: false,
   },
 );
 
-module.exports = mongoose.model('Log', Log);
+const LogStop = new mongoose.Schema(
+  {
+    name: String,
+    podStart: Date,
+    containerStart: Date,
+    containerStop: Date
+  },
+  {
+    collection: 'auditStop',
+    versionKey: false,
+  },
+);
+
+module.exports = {
+  LogStart: mongoose.model('LogStart', LogStart),
+  LogStop: mongoose.model('LogStop', LogStop)
+};

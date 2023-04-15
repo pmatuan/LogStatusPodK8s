@@ -1,29 +1,52 @@
+// const k8s = require('@kubernetes/client-node');
+// const kubeConfig = new k8s.KubeConfig();
+// kubeConfig.loadFromDefault();
+
+// const k8sApi = kubeConfig.makeApiClient(k8s.CoreV1Api);
+// const podName = 'pod-demo-57744c94f4-rc2gv';
+
+// // Get the pod information
+// k8sApi
+//   .readNamespacedPod(podName, 'default')
+//   .then((res) => {
+//     console.log(res.body);
+//     const startTime = res.body.status.startTime;
+//     const containerStatuses = res.body.status.containerStatuses;
+//     const container = containerStatuses[0];
+//     const startedAt = container.lastState.terminated.startedAt;
+//     const finishedAt = container.lastState.terminated.finishedAt;
+
+//     console.log(`Pod Name: ${podName}`);
+//     console.log(`Pod Started: ${startTime}`);
+//     console.log(`Started At: ${startedAt}`);
+//     console.log(`Finished At: ${finishedAt}`);
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
 const k8s = require('@kubernetes/client-node');
+const kubeConfig = new k8s.KubeConfig();
+kubeConfig.loadFromDefault();
 
-// create a Kubernetes API client
-const kc = new k8s.KubeConfig();
-kc.loadFromDefault();
+const k8sApi = kubeConfig.makeApiClient(k8s.CoreV1Api);
+const podName = 'pod-demo-6bfb48765b-4xfp7';
 
-const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+const getPodInformation = async (podName) => {
+  try {
+    const res = await k8sApi.readNamespacedPod(podName, 'default');
+    const startTime = res.body.status.startTime;
+    const containerStatuses = res.body.status.containerStatuses;
+    const container = containerStatuses[0];
+    const startedAt = container.lastState.terminated.startedAt;
+    const finishedAt = container.lastState.terminated.finishedAt;
+    console.log(`Pod Name: ${podName}`);
+    console.log(`Pod Started: ${startTime}`);
+    console.log(`Started At: ${startedAt}`);
+    console.log(`Finished At: ${finishedAt}`);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-// define the name prefix for the Pods
-const namePrefix = 'my-deployment';
-
-// list all Pods in the current namespace
-k8sApi.listPodForAllNamespaces().then((res) => {
-  const pods = res.body.items;
-
-  // iterate through the Pods and filter by name prefix
-  const filteredPods = pods.filter((pod) =>
-    pod.metadata.name.startsWith(namePrefix)
-  );
-
-  // iterate through the filtered Pods and log ID and status
-  filteredPods.forEach((pod) => {
-    const podId = pod.metadata.uid;
-    const podStatus = pod.status.phase;
-    console.log(`Pod ID: ${podId}, Status: ${podStatus}`);
-  });
-}).catch((err) => {
-  console.error(`Error: ${err}`);
-});
+getPodInformation(podName);

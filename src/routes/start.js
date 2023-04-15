@@ -1,9 +1,13 @@
 const express = require('express');
-const { getIDStatusOfPod } = require('../services/k8s');
+
+const { getPodInformationStart } = require('../services/k8s');
 const router = express.Router();
 
-router.get('/start', async (req, res) => {
-  getIDStatusOfPod('my-deployment');
+router.use(express.json()); 
+router.use(express.urlencoded({ extended: true })); 
+
+router.post('/start', async (req, res) => {
+  await getPodInformationStart(req.body.podName);
 });
 
 module.exports = router;
