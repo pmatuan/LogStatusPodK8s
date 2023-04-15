@@ -1,10 +1,25 @@
-const Log = require('../models/log');
+const { LogStart, LogStop } = require('../models/log');
 
-const logRespone = async (id, status) => {
+const logResponeStart = async (name, imageNameOfPod) => {
   try {
-    const log = new Log({
-      id,
-      status,
+    const log = new LogStart({
+      name,
+      imageNameOfPod,
+    });
+    await log.save();
+    console.log('Log saved to MongoDB');
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const logResponeStop = async (name, podStart, containerStart, containerStop) => {
+  try {
+    const log = new LogStop({
+      name,
+      podStart,
+      containerStart,
+      containerStop,
     });
     await log.save();
     console.log('Log saved to MongoDB');
@@ -13,4 +28,4 @@ const logRespone = async (id, status) => {
   }
 };
 
-module.exports = { logRespone };
+module.exports = { logResponeStart, logResponeStop };
