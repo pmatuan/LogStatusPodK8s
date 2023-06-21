@@ -1,7 +1,0 @@
-monitor trên máy: nodejs
-lưu vào MongoDB, table aulit (id, status)
-
-tạo deployment, pod với 3 replicaset
-khi kubectl apply -f ... thì gọi đến api start, log các thông tin liên quan đến id của pod, replicaset
-khi delete thì gọi đến api stop, log các thông tin liên quan đến id của pod, replicaset
-

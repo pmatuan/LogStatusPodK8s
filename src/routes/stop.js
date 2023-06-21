@@ -1,13 +1,14 @@
 const express = require('express');
+const { deletePodInfo } = require('../daos/deletePodInfo');
 
-const { getPodInformationStop } = require('../services/k8s');
 const router = express.Router();
 
-router.use(express.json()); 
-router.use(express.urlencoded({ extended: true })); 
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
 
 router.post('/stop', async (req, res) => {
-  await getPodInformationStop(req.body.podName);
+  res.send("Success");
+  await deletePodInfo(req.body.podName, req.body.namespace);
 });
 
 module.exports = router;
